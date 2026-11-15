@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayFlow HR — Employee Payroll Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #FBF8F6;
+            --bg-sidebar: #F5EBE4;
+            --bg-card: #FFFFFF;
+            --border-subtle: #EAE0D8;
+            --text-primary: #2D2A26;
+            --text-secondary: #7A736C;
+            --accent-terracotta: #D98A6C;
+            --accent-terracotta-hover: #C67658;
+            --accent-terracotta-soft: #EED8CE;
+            --accent-sage: #7E9F85;
+            --accent-sage-hover: #6B8B72;
+            --danger-bg: #FDF0ED;
+            --danger-text: #C85A48;
+            --shadow-card: 0 2px 10px rgba(45, 42, 38, 0.04);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-primary); display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 16px;
+            position: fixed;
+            height: 100vh;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 24px; border-bottom: 1px solid var(--border-subtle); }
+        .brand-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: var(--accent-terracotta); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px;
+        }
+        .brand-title { font-weight: 700; font-size: 16px; line-height: 1.2; }
+        .brand-sub { font-size: 10px; letter-spacing: 0.08em; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
+
+        .nav-section { margin-top: 22px; }
+        .nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-secondary); padding: 0 12px 8px; text-transform: uppercase; }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 4px;
+            color: var(--text-primary); font-size: 13.5px; font-weight: 500;
+            cursor: pointer; transition: all 0.15s ease; border: none; background: transparent; width: 100%; text-align: left;
+        }
+        .nav-item:hover { background: rgba(217, 138, 108, 0.14); }
+        .nav-item.active { background: var(--accent-terracotta-soft); color: #7C3D26; font-weight: 600; }
+
+        .team-card {
+            background: rgba(255,255,255,0.65); border: 1px solid var(--border-subtle);
+            border-radius: 10px; padding: 12px; font-size: 11.5px;
+        }
+        .team-card-title { font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .team-card-list { color: var(--text-secondary); line-height: 1.45; }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+            padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
+            background: #E8F3EA; color: #3D6B47;
+        }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4C9A5E; }
+
+        /* Main Content */
+        .main { margin-left: 250px; flex: 1; padding: 28px 36px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .page-title { font-size: 22px; font-weight: 700; }
+        .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+        .btn {
+            padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--accent-terracotta); color: #fff; }
+        .btn-primary:hover { background: var(--accent-terracotta-hover); }
+        .btn-sage { background: var(--accent-sage); color: #fff; }
+        .btn-sage:hover { background: var(--accent-sage-hover); }
+        .btn-outline { background: #fff; border-color: var(--border-subtle); color: var(--text-primary); }
+        .btn-outline:hover { background: #F7F2EE; }
+        .btn-sm { padding: 5px 11px; font-size: 12px; border-radius: 6px; }
+        .btn-danger { background: var(--danger-bg); color: var(--danger-text); border-color: #F5D5CE; }
+        .btn-danger:hover { background: #FAE0DA; }
+
+        /* Filter & Search Bar Card */
+        .filter-bar {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: 12px; padding: 14px 16px; margin-bottom: 22px;
+            display: flex; gap: 12px; align-items: center; box-shadow: var(--shadow-card); flex-wrap: wrap;
+        }
+        .search-input, .select-input {
+            padding: 9px 14px; border: 1px solid var(--border-subtle); border-radius: 8px;
+            font-size: 13.5px; color: var(--text-primary); background: #FCFBF9; outline: none;
+        }
+        .search-input { flex: 1; min-width: 240px; }
+        .search-input:focus, .select-input:focus { border-color: var(--accent-terracotta); }
+
+        /* KPI Summary Cards */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 22px; }
+        .kpi-card {
+            background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px;
+            padding: 18px 20px; box-shadow: var(--shadow-card);
+        }
+        .kpi-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        .kpi-value { font-size: 24px; font-weight: 700; margin-top: 6px; color: var(--text-primary); }
+        .kpi-sub { font-size: 12px; color: var(--accent-sage); font-weight: 600; margin-top: 4px; }
+
+        /* Main Data Table Card */
+        .table-card {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: 12px; box-shadow: var(--shadow-card); overflow: hidden;
+        }
+        .table-header {
+            padding: 16px 20px; border-bottom: 1px solid var(--border-subtle);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .table-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .table-count { font-size: 12.5px; color: var(--text-secondary); font-weight: 500; }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th {
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--text-secondary); padding: 13px 18px; border-bottom: 1px solid var(--border-subtle);
+            background: #FCFAF8;
+        }
+        td { padding: 15px 18px; border-bottom: 1px solid #F3ECE6; font-size: 13.5px; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #FDFBFA; }
+
+        .emp-id-badge { font-weight: 700; color: #B86B4E; font-size: 13px; }
+        .emp-name { font-weight: 600; color: #9E583E; }
+        .emp-email { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .dept-pill {
+            display: inline-block; padding: 4px 10px; border-radius: 6px;
+            background: #F4ECE6; color: #5E4B41; font-size: 12px; font-weight: 600;
+        }
+        .net-pay { font-weight: 700; color: #2D5A38; font-size: 14px; }
+        .action-group { display: flex; gap: 6px; }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(45, 42, 38, 0.45);
+            display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal {
+            background: #fff; border-radius: 14px; width: 100%; max-width: 540px;
+            border: 1px solid var(--border-subtle); box-shadow: 0 18px 40px rgba(0,0,0,0.16);
+            overflow: hidden;
+        }
+        .modal-head {
+            padding: 18px 22px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border-subtle);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-head h3 { font-size: 16px; font-weight: 700; }
+        .modal-body { padding: 20px 22px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .form-group input, .form-group select {
+            padding: 9px 12px; border: 1px solid var(--border-subtle); border-radius: 8px; font-size: 13.5px;
+        }
+        .net-preview {
+            margin-top: 16px; padding: 12px 16px; border-radius: 10px;
+            background: #F3F8F4; border: 1px solid #D3E6D7;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-foot {
+            padding: 14px 22px; border-top: 1px solid var(--border-subtle);
+            display: flex; justify-content: flex-end; gap: 10px; background: #FCFAF8;
+        }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        @media (max-width: 820px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <div class="brand">
+                <div class="brand-icon">₹</div>
+                <div>
+                    <div class="brand-title">PayFlow HR</div>
+                    <div class="brand-sub">Enterprise Payroll</div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">Navigation</div>
+                <button class="nav-item active" onclick="switchTab('payroll', this)">📊 Payroll Records</button>
+                <button class="nav-item" onclick="switchTab('departments', this)">🏢 Department Reports</button>
+                <button class="nav-item" onclick="openAddModal()">➕ Register Employee</button>
+                <button class="nav-item" onclick="openApiConfigModal()">🔗 Backend API Settings</button>
+            </div>
+        </div>
+
+        <div class="team-card">
+            <div class="team-card-title">Section 802A • Case Study 3</div>
+            <div class="team-card-list">
+                Kartik Rana (25BCS11387)<br>
+                Akshay Boora (25BCS11028)<br>
+                Kul Mahajan (25BCS12318)<br>
+                <em>Guide: Er. Shivam Sharma</em>
+            </div>
+            <div class="status-pill" id="connectionBadge">
+                <span class="status-dot"></span>
+                <span id="connectionText">Connecting...</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main">
+        <div class="topbar">
+            <h1 class="page-title" id="headerTitle">Employee Payroll & Salary Records</h1>
+            <div class="topbar-actions">
+                <button class="btn btn-primary" onclick="openAddModal()">+ Register Employee</button>
+                <button class="btn btn-sage" onclick="switchTab('departments', document.querySelectorAll('.nav-item')[1])">Department Report</button>
+            </div>
+        </div>
+
+        <!-- KPI Summary Strip -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Employees</div>
+                <div class="kpi-value" id="kpiEmployees">0</div>
+                <div class="kpi-sub">Active Payroll Roster</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Total Basic Pay</div>
+                <div class="kpi-value" id="kpiBasic">₹0</div>
+                <div class="kpi-sub">Monthly Base Compensation</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Allowances & Deductions</div>
+                <div class="kpi-value" id="kpiAllowDed">₹0 / -₹0</div>
+                <div class="kpi-sub">HRA+DA vs PF+Tax</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Net Monthly Payout</div>
+                <div class="kpi-value" id="kpiNet">₹0</div>
+                <div class="kpi-sub">Disbursable Net Salary</div>
+            </div>
+        </div>
+
+        <!-- VIEW 1: Employee Payroll Records -->
+        <section id="view-payroll" class="view-section active">
+            <div class="filter-bar">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search employees by name, email, or designation..." oninput="renderEmployees()" />
+                <select id="deptFilter" class="select-input" onchange="renderEmployees()">
+                    <option value="">Filter by Department (All)</option>
+                </select>
+                <button class="btn btn-primary" onclick="renderEmployees()">Filter</button>
+                <button class="btn btn-outline" onclick="resetFilters()">Reset</button>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">📄 Employee Compensation Archive</div>
+                    <div class="table-count" id="recordCount">Total Records: 0</div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>EMP ID</th>
+                                <th>EMPLOYEE DETAILS</th>
+                                <th>DEPARTMENT & ROLE</th>
+                                <th>BASIC SALARY</th>
+                                <th>ALLOWANCES (HRA+DA)</th>
+                                <th>DEDUCTIONS (PF+TAX)</th>
+                                <th>NET SALARY</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: Department-Wise Payroll Report -->
+        <section id="view-departments" class="view-section">
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">🏢 Department-Wise Payroll Aggregation Report (SQL GROUP BY)</div>
+                    <div class="table-count" id="deptCount">Departments: 0</div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>DEPARTMENT</th>
+                                <th>HEADCOUNT</th>
+                                <th>TOTAL BASIC</th>
+                                <th>TOTAL ALLOWANCES</th>
+                                <th>TOTAL DEDUCTIONS</th>
+                                <th>NET DEPARTMENT PAYOUT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="departmentTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add / Edit Employee & Salary Modal -->
+    <div class="modal-backdrop" id="payrollModal">
+        <div class="modal">
+            <div class="modal-head">
+                <h3 id="modalTitle">Register New Employee & Calculate Salary</h3>
+                <button class="btn btn-sm btn-outline" onclick="closeModal()">✕</button>
+            </div>
+            <form id="payrollForm" onsubmit="handleFormSubmit(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="editEmpId" />
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Employee Full Name *</label>
+                            <input type="text" id="fName" required placeholder="e.g. Kartik Rana" />
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address *</label>
+                            <input type="email" id="fEmail" required placeholder="e.g. kartik@company.com" />
+                        </div>
+                        <div class="form-group">
+                            <label>Department *</label>
+                            <input type="text" id="fDept" required placeholder="e.g. Engineering" />
+                        </div>
+                        <div class="form-group">
+                            <label>Designation *</label>
+                            <input type="text" id="fDesig" required placeholder="e.g. Software Developer" />
+                        </div>
+                        <div class="form-group full">
+                            <label>Basic Salary (₹) *</label>
+                            <input type="number" step="0.01" id="fBasic" required value="50000" oninput="updateLiveNet()" />
+                        </div>
+                        <div class="form-group">
+                            <label>HRA Allowance (₹) *</label>
+                            <input type="number" step="0.01" id="fHra" required value="15000" oninput="updateLiveNet()" />
+                        </div>
+                        <div class="form-group">
+                            <label>DA Allowance (₹) *</label>
+                            <input type="number" step="0.01" id="fDa" required value="5000" oninput="updateLiveNet()" />
+                        </div>
+                        <div class="form-group">
+                            <label>PF Deduction (₹) *</label>
+                            <input type="number" step="0.01" id="fPf" required value="6000" oninput="updateLiveNet()" />
+                        </div>
+                        <div class="form-group">
+                            <label>Tax Deduction (₹) *</label>
+                            <input type="number" step="0.01" id="fTax" required value="2500" oninput="updateLiveNet()" />
+                        </div>
+                    </div>
+
+                    <div class="net-preview">
+                        <div>
+                            <div style="font-size:12px; font-weight:600; color:#3D6B47;">Calculated Net Salary</div>
+                            <div style="font-size:11px; color:#5F7A65;">(Basic + HRA + DA) − (PF + Tax)</div>
+                        </div>
+                        <div style="font-size:20px; font-weight:700; color:#2D5A38;" id="liveNetDisplay">₹61,500.00</div>
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Save Payroll Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Backend API Configuration Modal (For connecting Netlify Frontend to Render Backend) -->
+    <div class="modal-backdrop" id="apiModal">
+        <div class="modal">
+            <div class="modal-head">
+                <h3>Connect Spring Boot Backend URL</h3>
+                <button class="btn btn-sm btn-outline" onclick="closeApiModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px; line-height:1.5;">
+                    When running locally via Spring Boot, leave this blank (uses <code>/api/payroll</code> automatically).
+                    When hosted on <strong>Netlify</strong>, paste your live <strong>Render</strong> backend URL below:
+                </p>
+                <div class="form-group">
+                    <label>Render Backend Base URL</label>
+                    <input type="url" id="apiBaseInput" placeholder="https://employee-payroll-api.onrender.com" />
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button type="button" class="btn btn-outline" onclick="clearApiUrl()">Use Local / Demo Mode</button>
+                <button type="button" class="btn btn-primary" onclick="saveApiUrl()">Save & Reconnect</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Seed fallback data if hosted statically without a live backend yet
+        const DEFAULT_SEED = [
+            { emp_id: 1, emp_name: 'Aarav Sharma', email: 'aarav.sharma@company.com', department: 'Engineering', designation: 'Software Engineer', join_date: '2025-06-15', basic_salary: 50000, hra: 15000, da: 5000, total_allowances: 20000, pf_deduction: 6000, tax_deduction: 2500, total_deductions: 8500, net_salary: 61500 },
+            { emp_id: 2, emp_name: 'Priya Verma', email: 'priya.verma@company.com', department: 'Engineering', designation: 'Senior Developer', join_date: '2024-03-10', basic_salary: 80000, hra: 24000, da: 8000, total_allowances: 32000, pf_deduction: 9600, tax_deduction: 6500, total_deductions: 16100, net_salary: 95900 },
+            { emp_id: 3, emp_name: 'Rohan Mehta', email: 'rohan.mehta@company.com', department: 'HR', designation: 'HR Manager', join_date: '2023-11-01', basic_salary: 60000, hra: 18000, da: 6000, total_allowances: 24000, pf_deduction: 7200, tax_deduction: 3500, total_deductions: 10700, net_salary: 73300 }
+        ];
+
+        let employees = [];
+        let backendConnected = false;
+
+        function getApiBase() {
+            const saved = localStorage.getItem('PAYFLOW_API_URL');
+            if (saved) return saved.replace(/\/$/, '') + '/api/payroll';
+            return '/api/payroll';
+        }
+
+        function formatINR(num) {
+            return '₹' + Number(num || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch(getApiBase() + '/employees');
+                if (!res.ok) throw new Error('API unreachable');
+                employees = await res.json();
+                backendConnected = true;
+                document.getElementById('connectionText').textContent = 'Spring Boot JDBC Live';
+            } catch (err) {
+                backendConnected = false;
+                document.getElementById('connectionText').textContent = 'Demo Mode (LocalStorage)';
+                const cached = localStorage.getItem('PAYFLOW_DEMO_DATA');
+                employees = cached ? JSON.parse(cached) : [...DEFAULT_SEED];
+                localStorage.setItem('PAYFLOW_DEMO_DATA', JSON.stringify(employees));
+            }
+            populateDeptDropdown();
+            updateKPIs();
+            renderEmployees();
+            renderDepartments();
+        }
+
+        function populateDeptDropdown() {
+            const select = document.getElementById('deptFilter');
+            const current = select.value;
+            const depts = [...new Set(employees.map(e => e.department))];
+            select.innerHTML = '<option value="">Filter by Department (All)</option>';
+            depts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                select.appendChild(opt);
+            });
+            select.value = current;
+        }
+
+        function updateKPIs() {
+            const totalEmp = employees.length;
+            const totalBasic = employees.reduce((s, e) => s + Number(e.basic_salary || 0), 0);
+            const totalAllow = employees.reduce((s, e) => s + Number(e.total_allowances || 0), 0);
+            const totalDed = employees.reduce((s, e) => s + Number(e.total_deductions || 0), 0);
+            const totalNet = employees.reduce((s, e) => s + Number(e.net_salary || 0), 0);
+
+            document.getElementById('kpiEmployees').textContent = totalEmp;
+            document.getElementById('kpiBasic').textContent = '₹' + totalBasic.toLocaleString('en-IN');
+            document.getElementById('kpiAllowDed').textContent = '+₹' + totalAllow.toLocaleString('en-IN') + ' / -₹' + totalDed.toLocaleString('en-IN');
+            document.getElementById('kpiNet').textContent = '₹' + totalNet.toLocaleString('en-IN');
+        }
+
+        function renderEmployees() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            const dept = document.getElementById('deptFilter').value;
+
+            const filtered = employees.filter(e => {
+                const matchText = !q ||
+                    String(e.emp_name).toLowerCase().includes(q) ||
+                    String(e.email).toLowerCase().includes(q) ||
+                    String(e.designation).toLowerCase().includes(q);
+                const matchDept = !dept || e.department === dept;
+                return matchText && matchDept;
+            });
+
+            document.getElementById('recordCount').textContent = `Total Records: ${filtered.length}`;
+            const tbody = document.getElementById('employeeTableBody');
+            tbody.innerHTML = '';
+
+            filtered.forEach(e => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="emp-id-badge">#EMP-${e.emp_id}</span></td>
+                    <td>
+                        <div class="emp-name">${e.emp_name}</div>
+                        <div class="emp-email">${e.email}</div>
+                    </td>
+                    <td>
+                        <span class="dept-pill">${e.department}</span>
+                        <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">${e.designation}</div>
+                    </td>
+                    <td>${formatINR(e.basic_salary)}</td>
+                    <td style="color:#3D6B47;">+${formatINR(e.total_allowances)}</td>
+                    <td style="color:#C85A48;">-${formatINR(e.total_deductions)}</td>
+                    <td><span class="net-pay">${formatINR(e.net_salary)}</span></td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-sm btn-outline" onclick="openEditModal(${e.emp_id})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteEmp(${e.emp_id})">Delete</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderDepartments() {
+            const grouped = {};
+            employees.forEach(e => {
+                if (!grouped[e.department]) {
+                    grouped[e.department] = { count: 0, basic: 0, allow: 0, ded: 0, net: 0 };
+                }
+                grouped[e.department].count += 1;
+                grouped[e.department].basic += Number(e.basic_salary || 0);
+                grouped[e.department].allow += Number(e.total_allowances || 0);
+                grouped[e.department].ded += Number(e.total_deductions || 0);
+                grouped[e.department].net += Number(e.net_salary || 0);
+            });
+
+            const entries = Object.entries(grouped).sort((a, b) => b[1].net - a[1].net);
+            document.getElementById('deptCount').textContent = `Departments: ${entries.length}`;
+            const tbody = document.getElementById('departmentTableBody');
+            tbody.innerHTML = '';
+
+            entries.forEach(([dept, stats]) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="dept-pill">${dept}</span></td>
+                    <td><strong>${stats.count}</strong> Employee(s)</td>
+                    <td>${formatINR(stats.basic)}</td>
+                    <td style="color:#3D6B47;">+${formatINR(stats.allow)}</td>
+                    <td style="color:#C85A48;">-${formatINR(stats.ded)}</td>
+                    <td><span class="net-pay">${formatINR(stats.net)}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById('view-' + tab).classList.add('active');
+            document.getElementById('headerTitle').textContent = tab === 'payroll'
+                ? 'Employee Payroll & Salary Records'
+                : 'Department-Wise Financial Payroll Report';
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('deptFilter').value = '';
+            renderEmployees();
+        }
+
+        function updateLiveNet() {
+            const basic = parseFloat(document.getElementById('fBasic').value) || 0;
+            const hra = parseFloat(document.getElementById('fHra').value) || 0;
+            const da = parseFloat(document.getElementById('fDa').value) || 0;
+            const pf = parseFloat(document.getElementById('fPf').value) || 0;
+            const tax = parseFloat(document.getElementById('fTax').value) || 0;
+            const net = (basic + hra + da) - (pf + tax);
+            document.getElementById('liveNetDisplay').textContent = formatINR(net);
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Register New Employee & Calculate Salary';
+            document.getElementById('editEmpId').value = '';
+            document.getElementById('fName').value = '';
+            document.getElementById('fEmail').value = '';
+            document.getElementById('fName').disabled = false;
+            document.getElementById('fEmail').disabled = false;
+            document.getElementById('fDept').value = 'Engineering';
+            document.getElementById('fDesig').value = 'Software Engineer';
+            document.getElementById('fBasic').value = 50000;
+            document.getElementById('fHra').value = 15000;
+            document.getElementById('fDa').value = 5000;
+            document.getElementById('fPf').value = 6000;
+            document.getElementById('fTax').value = 2500;
+            updateLiveNet();
+            document.getElementById('payrollModal').classList.add('open');
+        }
+
+        function openEditModal(empId) {
+            const emp = employees.find(x => x.emp_id === empId);
+            if (!emp) return;
+            document.getElementById('modalTitle').textContent = `Edit Payroll (#EMP-${emp.emp_id} • ${emp.emp_name})`;
+            document.getElementById('editEmpId').value = emp.emp_id;
+            document.getElementById('fName').value = emp.emp_name;
+            document.getElementById('fEmail').value = emp.email;
+            document.getElementById('fName').disabled = true;
+            document.getElementById('fEmail').disabled = true;
+            document.getElementById('fDept').value = emp.department;
+            document.getElementById('fDesig').value = emp.designation;
+            document.getElementById('fBasic').value = emp.basic_salary;
+            document.getElementById('fHra').value = emp.hra ?? Math.round(emp.total_allowances * 0.75);
+            document.getElementById('fDa').value = emp.da ?? Math.round(emp.total_allowances * 0.25);
+            document.getElementById('fPf').value = emp.pf_deduction ?? Math.round(emp.total_deductions * 0.7);
+            document.getElementById('fTax').value = emp.tax_deduction ?? Math.round(emp.total_deductions * 0.3);
+            updateLiveNet();
+            document.getElementById('payrollModal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('payrollModal').classList.remove('open');
+        }
+
+        async function handleFormSubmit(ev) {
+            ev.preventDefault();
+            const editId = document.getElementById('editEmpId').value;
+            const payload = {
+                emp_name: document.getElementById('fName').value.trim(),
+                email: document.getElementById('fEmail').value.trim(),
+                department: document.getElementById('fDept').value.trim(),
+                designation: document.getElementById('fDesig').value.trim(),
+                basic_salary: parseFloat(document.getElementById('fBasic').value),
+                hra: parseFloat(document.getElementById('fHra').value),
+                da: parseFloat(document.getElementById('fDa').value),
+                pf_deduction: parseFloat(document.getElementById('fPf').value),
+                tax_deduction: parseFloat(document.getElementById('fTax').value)
+            };
+
+            if (backendConnected) {
+                const url = editId ? `${getApiBase()}/employees/${editId}` : `${getApiBase()}/employees`;
+                const method = editId ? 'PUT' : 'POST';
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    alert('Error: ' + (err.error || 'Operation failed'));
+                    return;
+                }
+            } else {
+                const allow = payload.hra + payload.da;
+                const ded = payload.pf_deduction + payload.tax_deduction;
+                const net = payload.basic_salary + allow - ded;
+                if (editId) {
+                    const idx = employees.findIndex(x => x.emp_id == editId);
+                    if (idx !== -1) {
+                        employees[idx] = { ...employees[idx], ...payload, total_allowances: allow, total_deductions: ded, net_salary: net };
+                    }
+                } else {
+                    const nextId = employees.length ? Math.max(...employees.map(x => x.emp_id)) + 1 : 1;
+                    employees.push({ emp_id: nextId, ...payload, total_allowances: allow, total_deductions: ded, net_salary: net });
+                }
+                localStorage.setItem('PAYFLOW_DEMO_DATA', JSON.stringify(employees));
+            }
+            closeModal();
+            await loadData();
+        }
+
+        async function deleteEmp(id) {
+            if (!confirm(`Delete Employee #EMP-${id} and cascade-remove their salary details?`)) return;
+            if (backendConnected) {
+                await fetch(`${getApiBase()}/employees/${id}`, { method: 'DELETE' });
+            } else {
+                employees = employees.filter(e => e.emp_id !== id);
+                localStorage.setItem('PAYFLOW_DEMO_DATA', JSON.stringify(employees));
+            }
+            await loadData();
+        }
+
+        function openApiConfigModal() {
+            document.getElementById('apiBaseInput').value = localStorage.getItem('PAYFLOW_API_URL') || '';
+            document.getElementById('apiModal').classList.add('open');
+        }
+        function closeApiModal() { document.getElementById('apiModal').classList.remove('open'); }
+        function saveApiUrl() {
+            const val = document.getElementById('apiBaseInput').value.trim();
+            if (val) localStorage.setItem('PAYFLOW_API_URL', val);
+            closeApiModal();
+            loadData();
+        }
+        function clearApiUrl() {
+            localStorage.removeItem('PAYFLOW_API_URL');
+            document.getElementById('apiBaseInput').value = '';
+            closeApiModal();
+            loadData();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
